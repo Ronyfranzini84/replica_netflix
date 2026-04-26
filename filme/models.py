@@ -21,10 +21,15 @@ class Filme(models.Model):
 
     def __str__(self):
         return self.titulo
-        
-
+  
 
 # Criar os episódios
+class Episodio(models.Model):
+    filme = models.ForeignKey("Filme", on_delete=models.CASCADE, related_name='episodios')
+    titulo = models.CharField(max_length=100)
+    video = models.URLField(max_length=200)
 
+    def __str__(self):
+        return self.filme.titulo + " - " + self.titulo
 
 
