@@ -24,3 +24,16 @@ class DetalheFilme(DetailView):
 		filme_relacionados = Filme.objects.filter(categoria=self.get_object().categoria) # type: ignore
 		context['filme_relacionados'] = filme_relacionados
 		return context
+	
+class PesquisaFilme(ListView):
+	model = Filme
+	template_name = "pesquisa.html"
+
+	def get_queryset(self):
+		query = self.request.GET.get('query')
+		if query:
+			return Filme.objects.filter(titulo__icontains=query)
+		else:
+			return Filme.objects.none()
+
+	
