@@ -28,7 +28,7 @@ class Filme(models.Model):
 class Episodio(models.Model):
     filme = models.ForeignKey("Filme", on_delete=models.CASCADE, related_name='episodios')
     titulo = models.CharField(max_length=100)
-    video = models.URLField(max_length=200)
+    video = models.URLField()
 
     def __str__(self):
         return self.filme.titulo + " - " + self.titulo
