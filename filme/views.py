@@ -1,15 +1,29 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render, reverse
 from .models import Filme
-from django.views.generic import TemplateView, ListView, DetailView
+from .forms import CriarContaForm
+from django.views.generic import TemplateView, ListView, DetailView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import logout
 
 class Homepage(TemplateView):
 	template_name = "homepage.html"
 
-class Homefilmes(ListView):
+	def get(self, request, *args, **kwargs):
+		if request.user.is_authenticated:
+			return redirect('filme:homefilmes')
+		else:
+			return super().get(request, *args, **kwargs)
+
+
+# def logout_usuario(request):
+# 	logout(request)
+# 	return redirect('filme:homepage')
+
+class Homefilmes(LoginRequiredMixin, ListView):
 	model = Filme
 	template_name = "homefilmes.html"
 
-class DetalheFilme(DetailView):
+class DetalheFilme(LoginRequiredMixin, DetailView):
 	model = Filme
 	template_name = "detalhesfilme.html"
 
@@ -28,7 +42,7 @@ class DetalheFilme(DetailView):
 		context['filme_relacionados'] = filme_relacionados
 		return context
 	
-class PesquisaFilme(ListView):
+class PesquisaFilme(LoginRequiredMixin, ListView):
 	model = Filme
 	template_name = "pesquisa.html"
 
@@ -38,5 +52,19 @@ class PesquisaFilme(ListView):
 			return Filme.objects.filter(titulo__icontains=query)
 		else:
 			return Filme.objects.none()
+		
+class Paginaperfil(LoginRequiredMixin, TemplateView):
+	template_name = "editarperfil.html"
 
+
+class CriarConta(FormView):
+	template_name = "criarconta.html"
+	form_class = CriarContaForm
+
+	def form_valid(self, form):
+		form.save()
+		return super().form_valid(form)
 	
+
+	def get_success_url(self):
+		return reverse('filme:login')
